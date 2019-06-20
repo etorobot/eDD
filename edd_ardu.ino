@@ -1,6 +1,6 @@
 #include <ros.h>
 #include <geometry_msgs/Twist.h>
-#include <Adafruit_NeoPixel.h>
+#include <FastLED.h>
 #include <std_msgs/Float32.h>
 #include <TimerOne.h>
 
@@ -13,8 +13,13 @@
 #define LOOP_TIME 200000 
 #define enc_L_pin 18
 #define enc_R_pin 19
-//#deifne headlite
-//#define tailite 
+#define head_pin 30
+#define tail_pin 31
+#define headlites 40
+#define tailites 20
+
+CRGB headLeds[headlites];
+CRGB taiLeds[tailites];
 
 double rightwheel=0.0, leftwheel=0.0, radius = 0.08, wheel_base = 0.20,
        lite, angular=0, linear=0;
@@ -34,10 +39,10 @@ ros::Subscriber<geometry_msgs::Twist> cmd_vel_sub("cmd_vel", &cmd_vel_CB );
 void Motors_init();
 void MotorL(int PWML);
 void MotorR(int PWMR);
+//void lights();
 
 ros::Publisher left_vel_pub("/left_velocity", &left_vel);
 ros::Publisher right_vel_pub("/right_velocity", &right_vel);
-
 
 void setup(){
  Motors_init();
@@ -46,12 +51,14 @@ void setup(){
  nh.subscribe(cmd_vel_sub); 
  nh.advertise(left_vel_pub);
  nh.advertise(right_vel_pub);
-Timer1.attachInterrupt( timerIsr );}
+ Timer1.attachInterrupt( timerIsr );
+ FastLED.addLeds<WS2812B, head_pin,RGB>(headLeds,headlites);
+ FastLED.addLeds<WS2812B, tail_pin,RGB>(taiLeds,tailites);}
 
 void loop(){
  MotorL(leftwheel*10);
  MotorR(rightwheel*10);
- //ws28();
+ lights();
  nh.spinOnce(); }
  
 void enc_setup(){
@@ -122,8 +129,43 @@ void MotorR(int PWMR){
      digitalWrite(IN3, LOW);  }
 }
 
-/*
-void ws28(){
-if (PWMR>0){
-digitalWrite(
-if */
+void lights(){
+  if (leftwheel == rightwheel > 0){
+    for(int i =0; i<headlites; i++){
+      headLeds[i]=CRGB::White;}
+    for(int i=0; i < tailites; i++){
+      taiLeds[i]=CRGB::White;}}
+
+  if (leftwheel == rightwheel < 0){
+    for(int i =0; i<headlites; i++){
+      headLeds[i]=CRGB::Red;}
+    for(int i=0; i < tailites; i++){
+      taiLeds[i]=CRGB::White;
+      FastLED.show();  
+      delay(650);    
+      taiLeds[i]=CRGB::Black;
+      //FastLED.show();
+      //delay(150);
+      }}  
+
+   if (leftwheel && rightwheel == 0){
+    for(int i =0; i<headlites; i++){
+      headLeds[i]=CRGB::Red;}
+    for(int i=0; i < tailites; i++){
+      taiLeds[i]=CRGB::Red;}}
+
+   if (leftwheel > rightwheel){
+    for(int i =0; i<(headlites/2); i++){
+      headLeds[i]=CRGB::DarkOrange;}
+    for(int i=0; i < (tailites/2); i++){
+      taiLeds[i]=CRGB::DarkOrange;}}
+
+   if (leftwheel < rightwheel){
+    for(int i =((headlites/2)-1); i >=0; i--){
+      headLeds[i]=CRGB::DarkOrange;}
+    for(int i =((tailites/2)-1); i >=0; i--){
+      taiLeds[i]=CRGB::DarkOrange;}}
+             
+   FastLED.show();
+   delay(100);}
+   
