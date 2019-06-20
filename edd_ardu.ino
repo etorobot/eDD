@@ -15,8 +15,8 @@
 #define enc_R_pin 19
 #define head_pin 30
 #define tail_pin 31
-#define headlites 40
-#define tailites 20
+#define headlites 39
+#define tailites 21
 
 CRGB headLeds[headlites];
 CRGB taiLeds[tailites];
@@ -130,42 +130,54 @@ void MotorR(int PWMR){
 }
 
 void lights(){
+  int i, j;{
   if (leftwheel == rightwheel > 0){
-    for(int i =0; i<headlites; i++){
+    for(i =0; i<headlites; i++){
       headLeds[i]=CRGB::White;}
-    for(int i=0; i < tailites; i++){
-      taiLeds[i]=CRGB::White;}}
+    for(i=0; i < tailites/2; i++){
+      taiLeds[i]=CRGB::White;}
+      }
 
   if (leftwheel == rightwheel < 0){
-    for(int i =0; i<headlites; i++){
+    for(i =0; i<headlites; i++){
       headLeds[i]=CRGB::Red;}
-    for(int i=0; i < tailites; i++){
-      taiLeds[i]=CRGB::White;
-      FastLED.show();  
-      delay(650);    
-      taiLeds[i]=CRGB::Black;
+    for(i=0; i < tailites; i++){
+      taiLeds[i]=CRGB::White;}
+    
+      //FastLED.show();  
+      //delay(650);    
+      //taiLeds[i]=CRGB::Black;
       //FastLED.show();
       //delay(150);
-      }}  
+      }  
 
    if (leftwheel && rightwheel == 0){
-    for(int i =0; i<headlites; i++){
+    for(i =0; i < headlites; i++){
       headLeds[i]=CRGB::Red;}
-    for(int i=0; i < tailites; i++){
+    for(i=0; i < tailites; i++){
       taiLeds[i]=CRGB::Red;}}
+      
+    while (i=(headlites-1)){
+      FastLED.show();
+      delay(300);  }      
+      }
 
-   if (leftwheel > rightwheel){
-    for(int i =0; i<(headlites/2); i++){
+{  if (leftwheel > rightwheel){
+    for(i =0; i<(headlites/2); i++){
       headLeds[i]=CRGB::DarkOrange;}
-    for(int i=0; i < (tailites/2); i++){
-      taiLeds[i]=CRGB::DarkOrange;}}
+    for(j=0; j < (tailites/3); j++){
+      taiLeds[j]=CRGB::DarkOrange;}}
 
    if (leftwheel < rightwheel){
-    for(int i =((headlites/2)-1); i >=0; i--){
+    for( i =((headlites/2)-1); i >=0; i--){
       headLeds[i]=CRGB::DarkOrange;}
-    for(int i =((tailites/2)-1); i >=0; i--){
-      taiLeds[i]=CRGB::DarkOrange;}}
+    for(j=((tailites/3)-1);j>=0;j--){
+      taiLeds[j]=CRGB::DarkOrange;}}
              
-   FastLED.show();
+   while(i=(headlites/2)-1){
+    FastLED.show();
    delay(100);}
+
+}
+}
    
