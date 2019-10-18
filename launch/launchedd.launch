@@ -1,0 +1,35 @@
+<launch>
+
+	<include file="$(find freenect_launch)/launch/freenect.launch">
+		<arg name="depth_registration" value="true"/>
+	</include>
+
+	<include file="$(find rtabmap_ros)/launch/rtabmap.launch">
+		<arg name="rtabmap_args" value="--delete_db_on_start"/>
+		<arg name="rviz" value="true"/>
+		<arg name="rtabmapviz" value="false"/>
+	</include>
+
+	<node pkg="tf" type="static_transform_publisher" name="laser_broadcaster" 
+				args="0 0 0 3.14 0 0 base_link laser_frame 100" />
+	
+	<node pkg="rviz" type="rviz" name="rviz"/>
+	
+    <!-- Maping Node -->	
+	    <node pkg="gmapping" type="slam_gmapping" name="gmapping"
+	    output="screen">
+		<remap from="odom" to="your/odom/topic" />
+	        <param name="base_frame" value="base_link"/>
+	        <param name="odom_frame" value="odom" />
+	        <param name="delta" value="0.1" />
+	    </node>
+	    
+    <!--- Depth image to laser scan -->
+    <node pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" 
+    name="depthimage_to_laserscan" >
+        <param name="scan_height" value="3"/> 
+        <param name="output_frame_id" value="base_link"/>
+        <remap from="image" to="camera/depth/image_rect_color" />
+    </node>	   
+
+</launch>

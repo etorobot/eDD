@@ -1,0 +1,70 @@
+<launch>
+	<master auto="start"/>
+
+"""
+	<!-- PLATFORM SPECIFIC -->
+	<node pkg="p2os_driver" type="p2os_driver" name="p2os_driver" >
+		<param name="port" value="/dev/ttyUSB0" />
+		<param name="pulse" value="1.0" />"
+	</node>
+	<node pkg="rostopic" type="rostopic" name="enable_robot"
+	args="pub /cmd_motor_state p2os_driver/MotorState 1"
+	respawn="true">
+	</node>
+"""
+	<!-- TRANSFORMS -->
+	<node pkg="tf" type="static_transform_publisher" name="
+	Pioneer3AT_laserscan_tf" args="0.1 0 0.35 0 pi/2 pi/2
+	base_link camera_link 100" />
+
+"""
+	<!-- SENSORS CONFIGURATION -->
+	<arg name="kinect_camera_name" default="camera" />
+	<param name="/$(arg kinect_camera_name)/driver/data_skip" value="10" />
+	<param name="/$(arg kinect_camera_name)/driver/image_mode" value="5" />
+	<param name="/$(arg kinect_camera_name)/driver/depth_mode" value="5" />
+	<include file="$(find course_p3at_navigation)/myKinect.launch" />
+"""
+	<include file="$(find openni_launch)/launch/openni.launch"/>
+	<node respawn="true" pkg="depthimage_to_laserscan" type="
+	depthimage_to_laserscan" name="laserscan">
+	<remap from="image" to="/camera/depth/image" />
+	</node>
+
+		<!-- NAVIGATION -->
+		<node pkg="gmapping" type="slam_gmapping" respawn="false"
+		name="slam_gmapping" output="screen">
+			<param name="map_update_interval" value="5.0"/>
+			<param name="maxUrange" value="6.0"/>
+			<param name="iterations" value="1"/>
+			<param name="linearUpdate" value="0.25"/>
+			<param name="angularUpdate" value="0.262"/>
+			<param name="temporalUpdate" value="-1.0"/>
+			<param name="particles" value="300"/>
+			<param name="xmin" value="-50.0"/>
+			<param name="ymin" value="-50.0"/>
+			<param name="xmax" value="50.0"/>
+			<param name="ymax" value="50.0"/>
+			<param name="base_frame" value="base_link"/>
+		</node>
+	
+		<node pkg="move_base" type="move_base" respawn="false"
+		name="move_base" output="screen">
+			<rosparam file="$(find course_p3at_navigation)/
+				sg_costmap_common_params_p3at.yaml" command="
+				load" ns="global_costmap" />
+			<rosparam file="$(find course_p3at_navigation)/
+				sg_costmap_common_params_p3at.yaml" command="
+				load" ns="local_costmap" />
+			<rosparam file="$(find course_p3at_navigation)/
+				sg_local_costmap_params.yaml" command="load" />
+			<rosparam file="$(find course_p3at_navigation)/
+				sg_global_costmap_params.yaml" command="load" />
+			<rosparam file="$(find course_p3at_navigation)/
+				becker_base_local_planner_params.yaml" command=	"load" />
+			<param name="base_global_planner" type="string"
+				value=" navfn/NavfnROS" />
+			<param name="controller_frequency" type="double" value="6.0" />
+	</node>
+
+</launch>

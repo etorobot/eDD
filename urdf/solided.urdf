@@ -1,0 +1,64 @@
+<robot name="eddbot">
+  <link name="base_link">
+    <inertial>
+      <origin xyz="-0.23692 -0.004942 -0.071187" rpy="0 0 0" />
+      <mass value="27.097" />
+      <inertia
+        ixx="0.561810709570643"
+        ixy="-2.45010195771699E-06"
+        ixz="9.36320621052919E-08"
+        iyy="0.408097743243335"
+        iyz="-0.00481028525564954"
+        izz="0.880288084102076" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="1.5707963267949 0 0" />
+      <geometry>
+        <mesh filename="package://eddbot/urdf/solided.urdf.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="1.5707963267949 0 0" />
+      <geometry>
+        <mesh filename="package://eddbot/urdf/solided.urdf.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link name="wheel_1">
+	<visual>
+	<geometry>
+	<cylinder length="0.05" radius="0.05" />
+	</geometry>
+	<origin rpy="0 1.5 0" xyz="0.1 0.1 0" />
+	<material name="black">
+	<color rgba="0 0 0 1" />
+	</material>
+	</visual>
+	</link>
+	<link name="wheel_2">
+	<visual>
+	<geometry>
+	<cylinder length="0.05" radius="0.05" />
+	</geometry>
+	<origin rpy="0 1.5 0" xyz="-0.1 0.1 0" />
+	<material name="black" />
+	</visual>
+	</link>
+	<joint name="base_to_wheel1" type="fixed">
+		<parent link="base_link" />
+		<child link="wheel_1" />
+		<origin xyz="0 0 0" />
+	</joint>
+	<joint name="base_to_wheel2" type="fixed">
+		<parent link="base_link" />
+		<child link="wheel_2" />
+		<origin xyz="0 0 0" />
+	</joint>
+</robot>
